@@ -180,7 +180,7 @@ serializer.data
 ```python
 # snippets/serializers.py
 
-class SnippetModelSerializer(serializers.ModelSerializer):
+class SnippetSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Snippet
@@ -188,10 +188,10 @@ class SnippetModelSerializer(serializers.ModelSerializer):
 ```
 通过shell查看具体的字段是如何建立的
 ```python
-from snippets.serializers import SnippetModelSerializer
-serializer = SnippetModelSerializer()
+from snippets.serializers import SnippetSerializer
+serializer = SnippetSerializer()
 print(repr(serializer))
-# SnippetModelSerializer():
+# SnippetSerializer():
 #    id = IntegerField(label='ID', read_only=True)
 #    title = CharField(allow_blank=True, max_length=100, required=False)
 #    code = CharField(style={'base_template': 'textarea.html'})
