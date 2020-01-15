@@ -16,7 +16,8 @@ from rest_framework import permissions, authentication
 from .permissions import IsOwnerOrReadOnly, IsOwner
 from .models import Snippet
 from django.contrib.auth.models import User
-from .serializers import SnippetModelSerializer, SnippetSerializer, UserSerializer
+from .serializers import SnippetModelSerializer, SnippetSerializer, SnippetHyperLinkSerializer
+from .serializers import UserSerializer, UserHyperSerializer
 
 # Create your views here.
 
@@ -28,13 +29,13 @@ def api_root(request, format=None):
     })
 
 
-# generics base mixins views
+# generics base ViewSet
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     this viewset automatically provides `list` and `detail` actions.
     """
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserHyperSerializer
 
 
 class SnippetViewSet(viewsets.ModelViewSet):
@@ -44,10 +45,10 @@ class SnippetViewSet(viewsets.ModelViewSet):
     Additionally we also provide an extra `highlight` action.
     '''
     queryset = Snippet.objects.all()
-    serializer_class = SnippetModelSerializer
+    serializer_class = SnippetHyperLinkSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
-    @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
+    @action(detail=True, renderer_classes=[renderers.JSONRenderer])
     def highlight(self, request, *args, **kwargs):
         snippet = self.get_object()
         return Response(snippet.highlighted)
@@ -60,7 +61,7 @@ class SnippetViewSet(viewsets.ModelViewSet):
 # class-based generics
 class SnippetHighlight(generics.GenericAPIView):
     queryset = Snippet.objects.all()
-    renderer_classes = [renderers.StaticHTMLRenderer]
+    renderer_classes = [renderers.JSONRenderer]
 
     def get(self, request, *args, **kwargs):
         snippet = self.get_object()
