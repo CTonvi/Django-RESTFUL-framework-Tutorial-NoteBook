@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -38,8 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'snippets',
-
+    'rest_framework.authtoken',
+    # 'snippets',
+    'myuser',
 ]
 
 MIDDLEWARE = [
@@ -121,3 +123,36 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+AUTH_USER_MODEL = 'myuser.MyUser'
+
+REST_FRAMEWORK = {
+    # 用户登录认证方式
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        #'rest_framework.authentication.SessionAuthentication',
+        #'rest_framework.authentication.BasicAuthentication',
+    ),
+
+    'DEFAULT_PERMISSION_CLASSES': (
+        #'rest_framework.permissions.IsAuthenticated',
+    )
+}
+
+# JWT_EXPIRATION_DELTA 指明token的有效期
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=300),
+    'JWT_ALLOW_REFRESH': True,
+    # 续期有效期（在24小时内把未失效的token进行续期）
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(seconds=360),
+    # 自定义返回格式，需要手工创建
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'myuser.utils.jwt_response_payload_handler',
+    # 设置请求头的前缀
+    #'JWT_AUTH_HEADER_PREFIX': 'JWT', 
+}
+
+# 登录认证
+AUTHENTICATION_BACKENDS = {
+    #'django.contrib.auth.backends.ModelBackend',
+    'myuser.backends.CustomeBackend',
+}
